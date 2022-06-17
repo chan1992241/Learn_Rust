@@ -17,10 +17,14 @@ fn main() {
             println!("NO TO DO");
         } else {
             for (index, todo) in todos.iter().enumerate() {
+                let mut status = "DONE";
+                if todo.completed == false {
+                    status = "NOT DONE";
+                }
                 println!(
                     "{}. Status: {} | Created At: {} | To do title: {}",
                     &index + 1,
-                    todo.completed,
+                    status,
                     todo.create_at,
                     todo.title
                 );
