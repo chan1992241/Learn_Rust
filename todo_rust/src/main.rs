@@ -1,5 +1,10 @@
 use chrono::prelude::*;
-use std::io;
+use std::{
+    fmt::write,
+    fs::{File, OpenOptions},
+    io::{self, BufRead, BufReader, Error, Read, Write},
+    path::{self, Path},
+};
 
 #[derive(Debug)]
 struct ToDo {
@@ -8,26 +13,36 @@ struct ToDo {
     create_at: String,
 }
 
+fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
+    let mut status = "DONE";
+    if todo.completed == false {
+        status = "NOT DONE";
+    }
+    return format!(
+        "{}. Status: {} | Created At: {} | To do title: {}",
+        index + 1,
+        status,
+        todo.create_at,
+        todo.title
+    );
+}
+
 fn main() {
     let mut run = true;
+    let path = Path::new(".\\src\\todos.txt");
     let mut todos: Vec<ToDo> = Vec::new();
+    let mut file = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .open(path)
+        .expect("Failed to open file");
     while run != false {
         println!("All to do: \n");
         if todos.is_empty() {
             println!("NO TO DO");
         } else {
             for (index, todo) in todos.iter().enumerate() {
-                let mut status = "DONE";
-                if todo.completed == false {
-                    status = "NOT DONE";
-                }
-                println!(
-                    "{}. Status: {} | Created At: {} | To do title: {}",
-                    &index + 1,
-                    status,
-                    todo.create_at,
-                    todo.title
-                );
+                println!("{}", convert_todo_to_string(index as u8, todo));
             }
         }
         println!("\nAll action\n");
@@ -48,11 +63,19 @@ fn main() {
             io::stdin()
                 .read_line(&mut title)
                 .expect("Failed to read line");
-            todos.push(ToDo {
+            title = title.trim().to_string();
+            let new_to_do = ToDo {
                 title: title,
                 completed: false,
                 create_at: Utc::now().to_string(),
-            });
+            };
+            write!(
+                file,
+                "{}\n",
+                convert_todo_to_string(todos.len() as u8, &new_to_do)
+            )
+            .expect("Failed to write to file");
+            todos.push(new_to_do);
             println!("")
         } else if action.trim() == "2" {
             println!("Enter To Do index: ");
