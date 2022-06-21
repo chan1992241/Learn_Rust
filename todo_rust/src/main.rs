@@ -109,6 +109,7 @@ fn main() {
                 println!("Index out of range");
             } else {
                 todos[index - 1].completed = true;
+                update_todo_to_file(&todos, &file, &path);
             }
             println!("")
         } else {
