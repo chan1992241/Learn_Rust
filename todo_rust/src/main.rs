@@ -26,8 +26,12 @@ fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
     );
 }
 
-fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File) {
-    write(Path::new(".\\src\\todos.txt"), "").expect("Failed to write to file");
+fn clean_todo_data_txt(path: &Path) {
+    write(path, "").expect("Failed to write to file");
+}
+
+fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
+    clean_todo_data_txt(path);
     for (index, todo) in todos.iter().enumerate() {
         write!(file, "{}\n", convert_todo_to_string(index as u8, todo))
             .expect("Failed to write to file");
@@ -78,7 +82,7 @@ fn main() {
                 create_at: Utc::now().to_string(),
             };
             todos.push(new_to_do);
-            update_todo_to_file(&todos, &file);
+            update_todo_to_file(&todos, &file, &path);
             println!("")
         } else if action.trim() == "2" {
             println!("Enter To Do index: ");
@@ -91,7 +95,7 @@ fn main() {
                 println!("Index out of range");
             } else {
                 todos.remove(index - 1);
-                update_todo_to_file(&todos, &file);
+                update_todo_to_file(&todos, &file, &path);
             }
             println!("")
         } else if action.trim() == "3" {
