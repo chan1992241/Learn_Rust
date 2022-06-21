@@ -1,7 +1,8 @@
 use chrono::prelude::*;
 use std::{
     fs::{write, File, OpenOptions},
-    io::{self, Write},
+    io::{self, BufRead, BufReader, Write},
+    ops::Index,
     path::Path,
 };
 
@@ -38,6 +39,28 @@ fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
     }
 }
 
+fn convert_todo_string_to_todo(todo_string: &str) -> ToDo {
+    let todo_string_split: Vec<&str> = todo_string.split("|").collect();
+    let todo_title = todo_string_split[2]
+        .replace("To do title:", "")
+        .trim()
+        .to_string();
+    let todo_completed = todo_string_split[0]
+        .replace("1. Status:", "")
+        .trim()
+        .to_string()
+        == "DONE";
+    let todo_create_at = todo_string_split[1]
+        .replace("Created At: ", "")
+        .trim()
+        .to_string();
+    return ToDo {
+        title: todo_title,
+        completed: todo_completed,
+        create_at: todo_create_at.to_string(),
+    };
+}
+
 fn main() {
     let mut run = true;
     let path = Path::new(".\\src\\todos.txt");
@@ -50,12 +73,11 @@ fn main() {
         .expect("Failed to open file");
     while run != false {
         println!("All to do: \n");
-        if todos.is_empty() {
-            println!("NO TO DO");
-        } else {
-            for (index, todo) in todos.iter().enumerate() {
-                println!("{}", convert_todo_to_string(index as u8, todo));
-            }
+        let reader = BufReader::new(&file);
+        for line in reader.lines() {
+            let tododetail = line.unwrap();
+            println!("{}", &tododetail);
+            todos.push(convert_todo_string_to_todo(&tododetail));
         }
         println!("\nAll action\n");
         println!("1. Add To Do");
