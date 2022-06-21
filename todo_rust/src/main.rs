@@ -1,9 +1,8 @@
 use chrono::prelude::*;
 use std::{
-    fmt::write,
-    fs::{File, OpenOptions},
-    io::{self, BufRead, BufReader, Error, Read, Write},
-    path::{self, Path},
+    fs::{write, File, OpenOptions},
+    io::{self, Write},
+    path::Path,
 };
 
 #[derive(Debug)]
@@ -28,8 +27,7 @@ fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
 }
 
 fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File) {
-    file.write_all("".as_bytes())
-        .expect("Failed to write to file");
+    write(Path::new(".\\src\\todos.txt"), "").expect("Failed to write to file");
     for (index, todo) in todos.iter().enumerate() {
         write!(file, "{}\n", convert_todo_to_string(index as u8, todo))
             .expect("Failed to write to file");
@@ -79,12 +77,6 @@ fn main() {
                 completed: false,
                 create_at: Utc::now().to_string(),
             };
-            // write!(
-            //     &file,
-            //     "{}\n",
-            //     convert_todo_to_string(todos.len() as u8, &new_to_do)
-            // )
-            // .expect("Failed to write to file");
             todos.push(new_to_do);
             update_todo_to_file(&todos, &file);
             println!("")
