@@ -27,12 +27,22 @@ fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
     );
 }
 
+fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File) {
+    file.write_all("".as_bytes())
+        .expect("Failed to write to file");
+    for (index, todo) in todos.iter().enumerate() {
+        write!(file, "{}\n", convert_todo_to_string(index as u8, todo))
+            .expect("Failed to write to file");
+    }
+}
+
 fn main() {
     let mut run = true;
     let path = Path::new(".\\src\\todos.txt");
     let mut todos: Vec<ToDo> = Vec::new();
-    let mut file = OpenOptions::new()
+    let file = OpenOptions::new()
         .read(true)
+        .write(true)
         .append(true)
         .open(path)
         .expect("Failed to open file");
@@ -69,13 +79,14 @@ fn main() {
                 completed: false,
                 create_at: Utc::now().to_string(),
             };
-            write!(
-                file,
-                "{}\n",
-                convert_todo_to_string(todos.len() as u8, &new_to_do)
-            )
-            .expect("Failed to write to file");
+            // write!(
+            //     &file,
+            //     "{}\n",
+            //     convert_todo_to_string(todos.len() as u8, &new_to_do)
+            // )
+            // .expect("Failed to write to file");
             todos.push(new_to_do);
+            update_todo_to_file(&todos, &file);
             println!("")
         } else if action.trim() == "2" {
             println!("Enter To Do index: ");
@@ -88,6 +99,7 @@ fn main() {
                 println!("Index out of range");
             } else {
                 todos.remove(index - 1);
+                update_todo_to_file(&todos, &file);
             }
             println!("")
         } else if action.trim() == "3" {
