@@ -1,8 +1,11 @@
+/*
+ * What is the difference between
+ * (todo: &ToDo) and (todos: &mut Vec<ToDo>) and (mut file: &File)?
+ *  */
 use chrono::prelude::*;
 use std::{
     fs::{write, File, OpenOptions},
     io::{self, BufRead, BufReader, Write},
-    ops::Index,
     path::Path,
 };
 
@@ -105,7 +108,7 @@ fn main() {
                 .expect("Failed to read line");
             title = title.trim().to_string();
             let new_to_do = ToDo {
-                title: title,
+                title,
                 completed: false,
                 create_at: Utc::now().to_string(),
             };
