@@ -75,6 +75,9 @@ fn load_data_to_vec(file: &mut File, todos: &mut Vec<ToDo>) {
 fn main() {
     let mut run = true;
     let path = Path::new(".\\src\\todos.txt");
+    if !path.exists() {
+        write(path, "").expect("Failed to write to file");
+    }
     let mut todos: Vec<ToDo> = Vec::new();
     let mut file = OpenOptions::new()
         .read(true)
