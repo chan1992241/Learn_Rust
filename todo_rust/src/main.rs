@@ -61,23 +61,29 @@ fn convert_todo_string_to_todo(todo_string: &str) -> ToDo {
     };
 }
 
+fn load_data_to_vec(file: &mut File, todos: &mut Vec<ToDo>) {
+    let reader = BufReader::new(file);
+    for line in reader.lines() {
+        let tododetail = line.unwrap();
+        todos.push(convert_todo_string_to_todo(&tododetail));
+    }
+}
+
 fn main() {
     let mut run = true;
     let path = Path::new(".\\src\\todos.txt");
     let mut todos: Vec<ToDo> = Vec::new();
-    let file = OpenOptions::new()
+    let mut file = OpenOptions::new()
         .read(true)
         .write(true)
         .append(true)
         .open(path)
         .expect("Failed to open file");
+    load_data_to_vec(&mut file, &mut todos);
     while run != false {
         println!("All to do: \n");
-        let reader = BufReader::new(&file);
-        for line in reader.lines() {
-            let tododetail = line.unwrap();
-            println!("{}", &tododetail);
-            todos.push(convert_todo_string_to_todo(&tododetail));
+        for (index, todo) in todos.iter().enumerate() {
+            println!("{}", convert_todo_to_string(index as u8, todo));
         }
         println!("\nAll action\n");
         println!("1. Add To Do");
