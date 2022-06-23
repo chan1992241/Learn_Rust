@@ -40,12 +40,12 @@ fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
     );
 }
 
-fn clean_todo_data_txt(path: &Path) {
+fn clean_todos_data_txt(path: &Path) {
     write(path, "").expect("Failed to write to file");
 }
 
 fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
-    clean_todo_data_txt(path);
+    clean_todos_data_txt(path);
     for (index, todo) in todos.iter().enumerate() {
         write!(file, "{}\n", convert_todo_to_string(index as u8, todo))
             .expect("Failed to write to file");
