@@ -16,6 +16,16 @@ struct ToDo {
     create_at: String,
 }
 
+impl ToDo {
+    pub fn new(title: String, completed: bool, create_at: String) -> Self {
+        Self {
+            title,
+            completed,
+            create_at,
+        }
+    }
+}
+
 fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
     let mut status = "DONE";
     if todo.completed == false {
@@ -57,11 +67,7 @@ fn convert_todo_string_to_todo(todo_string: &str) -> ToDo {
         .replace("Created At: ", "")
         .trim()
         .to_string();
-    return ToDo {
-        title: todo_title,
-        completed: todo_completed,
-        create_at: todo_create_at.to_string(),
-    };
+    return ToDo::new(todo_title, todo_completed, todo_create_at);
 }
 
 fn load_data_to_vec(file: &mut File, todos: &mut Vec<ToDo>) {
@@ -110,11 +116,7 @@ fn main() {
                 .read_line(&mut title)
                 .expect("Failed to read line");
             title = title.trim().to_string();
-            let new_to_do = ToDo {
-                title,
-                completed: false,
-                create_at: Utc::now().to_string(),
-            };
+            let new_to_do = ToDo::new(title, false, Utc::now().to_string());
             todos.push(new_to_do);
             update_todo_to_file(&todos, &file, &path);
             println!("")
