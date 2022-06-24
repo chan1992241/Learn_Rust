@@ -52,14 +52,14 @@ fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
     }
 }
 
-fn convert_todo_string_to_todo(todo_string: &str) -> ToDo {
+fn convert_todo_string_to_todo(todo_string: &str, index: u8) -> ToDo {
     let todo_string_split: Vec<&str> = todo_string.split("|").collect();
     let todo_title = todo_string_split[2]
         .replace("To do title:", "")
         .trim()
         .to_string();
     let todo_completed = todo_string_split[0]
-        .replace("1. Status:", "")
+        .replace(&format!("{}. Status: ", index + 1), "")
         .trim()
         .to_string()
         == "DONE";
@@ -72,9 +72,9 @@ fn convert_todo_string_to_todo(todo_string: &str) -> ToDo {
 
 fn load_data_to_vec(file: &mut File, todos: &mut Vec<ToDo>) {
     let reader = BufReader::new(file);
-    for line in reader.lines() {
+    for (index, line) in reader.lines().enumerate() {
         let tododetail = line.unwrap();
-        todos.push(convert_todo_string_to_todo(&tododetail));
+        todos.push(convert_todo_string_to_todo(&tododetail, index as u8));
     }
 }
 
