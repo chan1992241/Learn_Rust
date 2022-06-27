@@ -24,57 +24,57 @@ impl ToDo {
             create_at,
         }
     }
-}
-
-fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
-    let mut status = "DONE";
-    if todo.completed == false {
-        status = "NOT DONE";
+    pub fn clean_todos_data_txt(path: &Path) {
+        write(path, "").expect("Failed to write to file");
     }
-    return format!(
-        "{}. Status: {} | Created At: {} | To do title: {}",
-        index + 1,
-        status,
-        todo.create_at,
-        todo.title
-    );
-}
-
-fn clean_todos_data_txt(path: &Path) {
-    write(path, "").expect("Failed to write to file");
-}
-
-fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
-    clean_todos_data_txt(path);
-    for (index, todo) in todos.iter().enumerate() {
-        write!(file, "{}\n", convert_todo_to_string(index as u8, todo))
+    pub fn convert_todo_string_to_todo(todo_string: &str, index: u8) -> ToDo {
+        let todo_string_split: Vec<&str> = todo_string.split("|").collect();
+        let todo_title = todo_string_split[2]
+            .replace("To do title:", "")
+            .trim()
+            .to_string();
+        let todo_completed = todo_string_split[0]
+            .replace(&format!("{}. Status: ", index + 1), "")
+            .trim()
+            .to_string()
+            == "DONE";
+        let todo_create_at = todo_string_split[1]
+            .replace("Created At: ", "")
+            .trim()
+            .to_string();
+        return ToDo::new(todo_title, todo_completed, todo_create_at);
+    }
+    pub fn convert_todo_to_string(index: u8, todo: &ToDo) -> String {
+        let mut status = "DONE";
+        if todo.completed == false {
+            status = "NOT DONE";
+        }
+        return format!(
+            "{}. Status: {} | Created At: {} | To do title: {}",
+            index + 1,
+            status,
+            todo.create_at,
+            todo.title
+        );
+    }
+    pub fn update_todo_to_file(todos: &Vec<ToDo>, mut file: &File, path: &Path) {
+        ToDo::clean_todos_data_txt(path);
+        for (index, todo) in todos.iter().enumerate() {
+            write!(
+                file,
+                "{}\n",
+                ToDo::convert_todo_to_string(index as u8, todo)
+            )
             .expect("Failed to write to file");
+        }
     }
-}
-
-fn convert_todo_string_to_todo(todo_string: &str, index: u8) -> ToDo {
-    let todo_string_split: Vec<&str> = todo_string.split("|").collect();
-    let todo_title = todo_string_split[2]
-        .replace("To do title:", "")
-        .trim()
-        .to_string();
-    let todo_completed = todo_string_split[0]
-        .replace(&format!("{}. Status: ", index + 1), "")
-        .trim()
-        .to_string()
-        == "DONE";
-    let todo_create_at = todo_string_split[1]
-        .replace("Created At: ", "")
-        .trim()
-        .to_string();
-    return ToDo::new(todo_title, todo_completed, todo_create_at);
 }
 
 fn load_data_to_vec(file: &mut File, todos: &mut Vec<ToDo>) {
     let reader = BufReader::new(file);
     for (index, line) in reader.lines().enumerate() {
         let tododetail = line.unwrap();
-        todos.push(convert_todo_string_to_todo(&tododetail, index as u8));
+        todos.push(ToDo::convert_todo_string_to_todo(&tododetail, index as u8));
     }
 }
 
@@ -95,7 +95,7 @@ fn main() {
     while run != false {
         println!("All to do: \n");
         for (index, todo) in todos.iter().enumerate() {
-            println!("{}", convert_todo_to_string(index as u8, todo));
+            println!("{}", ToDo::convert_todo_to_string(index as u8, todo));
         }
         println!("\nAll action\n");
         println!("1. Add To Do");
@@ -118,7 +118,7 @@ fn main() {
             title = title.trim().to_string();
             let new_to_do = ToDo::new(title, false, Utc::now().to_string());
             todos.push(new_to_do);
-            update_todo_to_file(&todos, &file, &path);
+            ToDo::update_todo_to_file(&todos, &file, &path);
             println!("")
         } else if action.trim() == "2" {
             println!("Enter To Do index: ");
@@ -131,7 +131,7 @@ fn main() {
                 println!("Index out of range");
             } else {
                 todos.remove(index - 1);
-                update_todo_to_file(&todos, &file, &path);
+                ToDo::update_todo_to_file(&todos, &file, &path);
             }
             println!("")
         } else if action.trim() == "3" {
@@ -145,7 +145,7 @@ fn main() {
                 println!("Index out of range");
             } else {
                 todos[index - 1].completed = true;
-                update_todo_to_file(&todos, &file, &path);
+                ToDo::update_todo_to_file(&todos, &file, &path);
             }
             println!("")
         } else {
