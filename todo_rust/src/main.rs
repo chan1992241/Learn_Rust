@@ -19,6 +19,16 @@ struct ToDo {
     create_at: String,
 }
 
+trait ToDoTrait {
+    fn mark_todo_as_completed(&mut self);
+}
+
+impl ToDoTrait for ToDo {
+    fn mark_todo_as_completed(&mut self) {
+        self.completed = true;
+    }
+}
+
 impl ToDo {
     pub fn new(title: String, completed: bool, create_at: String) -> Self {
         Self {
@@ -26,9 +36,6 @@ impl ToDo {
             completed,
             create_at,
         }
-    }
-    fn mark_todo_as_completed(&mut self) {
-        self.completed = true;
     }
     pub fn clean_todos_data_txt(path: &Path) {
         write(path, "").expect("Failed to write to file");
