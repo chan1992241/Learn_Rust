@@ -9,6 +9,9 @@ use std::{
     path::Path,
 };
 
+// struct Data(i32, i32);
+// Data.0, Data.1
+
 #[derive(Debug)]
 struct ToDo {
     title: String,
@@ -23,6 +26,9 @@ impl ToDo {
             completed,
             create_at,
         }
+    }
+    fn mark_todo_as_completed(&mut self) {
+        self.completed = true;
     }
     pub fn clean_todos_data_txt(path: &Path) {
         write(path, "").expect("Failed to write to file");
@@ -144,7 +150,7 @@ fn main() {
             if index > todos.len() {
                 println!("Index out of range");
             } else {
-                todos[index - 1].completed = true;
+                todos[index - 1].mark_todo_as_completed();
                 ToDo::update_todo_to_file(&todos, &file, &path);
             }
             println!("")
