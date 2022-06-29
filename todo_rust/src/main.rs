@@ -120,49 +120,55 @@ fn main() {
         io::stdin()
             .read_line(&mut action)
             .expect("Failed to read line");
-        if action.trim() == "4" {
-            run = false;
-        } else if action.trim() == "1" {
-            println!("Enter To Do title: ");
-            let mut title: String = String::new();
-            io::stdin()
-                .read_line(&mut title)
-                .expect("Failed to read line");
-            title = title.trim().to_string();
-            let new_to_do = ToDo::new(title, false, Utc::now().to_string());
-            todos.push(new_to_do);
-            ToDo::update_todo_to_file(&todos, &file, &path);
-            println!("")
-        } else if action.trim() == "2" {
-            println!("Enter To Do index: ");
-            let mut index: String = String::new();
-            io::stdin()
-                .read_line(&mut index)
-                .expect("Failed to read line");
-            let index: usize = index.trim().parse().expect("Please enter a number");
-            if index > todos.len() {
-                println!("Index out of range");
-            } else {
-                todos.remove(index - 1);
-                ToDo::update_todo_to_file(&todos, &file, &path);
+        match action.trim() {
+            "4" => {
+                run = false;
             }
-            println!("")
-        } else if action.trim() == "3" {
-            println!("Enter To Do index: ");
-            let mut index: String = String::new();
-            io::stdin()
-                .read_line(&mut index)
-                .expect("Failed to read line");
-            let index: usize = index.trim().parse().expect("Please enter a number");
-            if index > todos.len() {
-                println!("Index out of range");
-            } else {
-                todos[index - 1].mark_todo_as_completed();
+            "1" => {
+                println!("Enter To Do title: ");
+                let mut title: String = String::new();
+                io::stdin()
+                    .read_line(&mut title)
+                    .expect("Failed to read line");
+                title = title.trim().to_string();
+                let new_to_do = ToDo::new(title, false, Utc::now().to_string());
+                todos.push(new_to_do);
                 ToDo::update_todo_to_file(&todos, &file, &path);
+                println!("")
             }
-            println!("")
-        } else {
-            println!("Invalid action");
+            "2" => {
+                println!("Enter To Do index: ");
+                let mut index: String = String::new();
+                io::stdin()
+                    .read_line(&mut index)
+                    .expect("Failed to read line");
+                let index: usize = index.trim().parse().expect("Please enter a number");
+                if index > todos.len() {
+                    println!("Index out of range");
+                } else {
+                    todos.remove(index - 1);
+                    ToDo::update_todo_to_file(&todos, &file, &path);
+                }
+                println!("")
+            }
+            "3" => {
+                println!("Enter To Do index: ");
+                let mut index: String = String::new();
+                io::stdin()
+                    .read_line(&mut index)
+                    .expect("Failed to read line");
+                let index: usize = index.trim().parse().expect("Please enter a number");
+                if index > todos.len() {
+                    println!("Index out of range");
+                } else {
+                    todos[index - 1].mark_todo_as_completed();
+                    ToDo::update_todo_to_file(&todos, &file, &path);
+                }
+                println!("")
+            }
+            _ => {
+                println!("Invalid action");
+            }
         }
     }
 }
